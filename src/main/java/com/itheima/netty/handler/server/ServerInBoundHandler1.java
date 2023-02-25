@@ -1,0 +1,81 @@
+package com.itheima.netty.handler.server;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.StandardCharsets;
+
+/**
+ * @author: xuebin
+ * @description
+ * @Date: 2023/2/7 14:21
+ */
+@Slf4j
+public class ServerInBoundHandler1 extends ChannelInboundHandlerAdapter {
+
+    /**
+     * 连接已建立好，通道初始化完成
+     *
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.info("ServerInboundHandler1 channelActive-----");
+
+        //将事件向下传递
+        super.channelActive(ctx);
+    }
+
+    /**
+     * 读到从channel中读取到数据
+     *
+     * @param ctx
+     * @param msg ButeBuf--->ByteBuffer
+     * @throws Exception
+     */
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.info("ServerInboundHandler1 channelRead----,remoteAddress={}", ctx.channel().remoteAddress());
+
+        ByteBuf buf = (ByteBuf) msg;
+
+        log.info("ServerInboundHandler1:received client data = {}", buf.toString(StandardCharsets.UTF_8));
+        //处理数据
+        ctx.fireChannelActive();
+        super.channelRead(ctx, msg);
+    }
+
+    /**
+     * channel数据读取完成
+     *
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        log.info("ServerInboundHandler1 channelReadComplete----");
+
+        String msg = "hello cline ,i am sever";
+        ByteBuf buffer = ctx.alloc().buffer();
+        buffer.writeBytes(msg.getBytes(StandardCharsets.UTF_8));
+        ctx.writeAndFlush(buffer);
+//        ctx.channel().writeAndFlush(buffer);
+        super.channelReadComplete(ctx);
+    }
+
+    /**
+     * 异常回调
+     *
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.info("ServerInboundHandler1 exceptionCaught----,cause={}", cause.getMessage());
+        super.exceptionCaught(ctx, cause);
+    }
+}
