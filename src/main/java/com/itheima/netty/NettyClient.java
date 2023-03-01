@@ -1,6 +1,7 @@
 package com.itheima.netty;
 
 import com.itheima.netty.handler.client.ClientInboundHandler1;
+import com.itheima.netty.handler.client.ClientSimpleInboundHandler2;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -42,6 +43,7 @@ public class NettyClient {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new ClientInboundHandler1());
+                            pipeline.addLast(new ClientSimpleInboundHandler2());
                         }
                     });
 
