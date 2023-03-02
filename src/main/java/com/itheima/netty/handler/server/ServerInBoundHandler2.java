@@ -35,7 +35,7 @@ public class ServerInBoundHandler2 extends ChannelInboundHandlerAdapter {
      * 读到从channel中读取到数据
      *
      * @param ctx
-     * @param msg ButeBuf--->ByteBuffer
+     * @param msg ByteBuf--->ByteBuffer
      * @throws Exception
      */
     @Override

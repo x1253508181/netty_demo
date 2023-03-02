@@ -2,8 +2,7 @@ package com.itheima.netty.handler.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -62,8 +61,25 @@ public class ServerInBoundHandler1 extends ChannelInboundHandlerAdapter {
         String msg = "hello cline ,i am sever";
         ByteBuf buffer = ctx.alloc().buffer();
         buffer.writeBytes(msg.getBytes(StandardCharsets.UTF_8));
+
+//        ChannelPromise channelPromise = ctx.newPromise();
+//        ChannelFuture channelFuture1 = ctx.writeAndFlush(buffer, channelPromise);
+//
+//        channelPromise.addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture future) throws Exception {
+//
+//            }
+//        });
+//
+//        ChannelFuture channelFuture = ctx.writeAndFlush(buffer);
+//        channelFuture.addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture future) throws Exception {
+//                log.info("write 结束");
+//            }
+//        });
         ctx.writeAndFlush(buffer);
-//        ctx.channel().writeAndFlush(buffer);
         super.channelReadComplete(ctx);
     }
 

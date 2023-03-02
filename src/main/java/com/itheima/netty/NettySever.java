@@ -1,8 +1,7 @@
 package com.itheima.netty;
 
-import com.itheima.netty.handler.server.ServerInBoundHandler1;
+import com.itheima.netty.handler.server.MyHttpServerHandler;
 import com.itheima.netty.handler.server.ServerInBoundHandler2;
-import com.itheima.netty.handler.server.ServerOutBoundHandler1;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,6 +10,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -50,16 +52,41 @@ public class NettySever {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline pipeline = socketChannel.pipeline();
-                            //想pipeline添加handler
-                            pipeline.addLast(new ServerOutBoundHandler1());
+                            //进自上而下
+                            //出自下而上
 
-                            pipeline.addLast(new ServerInBoundHandler1());
+                            //编写http案例
+
+                            pipeline.addLast(new HttpResponseEncoder());
+
+                            pipeline.addLast(new HttpRequestDecoder());
+                            pipeline.addLast(new HttpObjectAggregator(1024 * 1024 * 8));
+
+                            pipeline.addLast(new MyHttpServerHandler());
+
+                            //想pipeline添加handler
+//                            pipeline.addLast(new ServerOutBoundHandler1());
+
+//                            pipeline.addLast(new ServerInBoundHandler1());
                             //pipeline.addLast(new ServerInBoundHandler2());
-                            pipeline.addLast(serverInBoundHandler2);
+//                            pipeline.addLast(serverInBoundHandler2);
+//                            pipeline.addLast(new LineBasedFrameDecoder(65536));
+//                            byte[] bytes = "@".getBytes(StandardCharsets.UTF_8);
+//                            ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
+//                             pipeline.addLast(new DelimiterBasedFrameDecoder(65536, byteBuf));
+
+//                            pipeline.addLast(new LengthFieldPrepender(2));
+////                            pipeline.addLast(new StringEncoder());
+//                            pipeline.addLast(new ProtostuffEncoder());
+//
+//                            pipeline.addLast(new LengthFieldBasedFrameDecoder(65536, 0, 2, 0, 2));
+////                            pipeline.addLast(new StringDecoder());
+//                            pipeline.addLast(new ProtostuffDecoder());
+//                            pipeline.addLast(new TcpStickHalfHandler1());
                         }
                     });
             //服务端绑定端口启动
-              ChannelFuture future = serverBootstrap.bind(port).sync();
+            ChannelFuture future = serverBootstrap.bind(port).sync();
             //阻塞，监听服务端端口的关闭
             future.channel().closeFuture().sync();
         } catch (Exception e) {
